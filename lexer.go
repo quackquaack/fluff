@@ -3,6 +3,7 @@ package fluff
 import (
 	"fmt"
 	"os"
+	"sync"
 )
 
 type lexer struct {
@@ -66,7 +67,10 @@ func skip(l *lexer) (err string) {
 	return ""
 }
 
-func Lex(file *os.File, lexemes chan Lexeme) (err string) {
+func Lex(file *os.File, lexemes chan Lexeme, wg *sync.WaitGroup) (err string) {
+	defer close(lexemes)
+	defer wg.Done()
+
 	l := &lexer{
 		File:    file,
 		Lexemes: lexemes,
